@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-env
+data:
+  env: "development"
+  jwt_secret: "secret"
+  username: "admin"
+  password: "secret"
+  mongo_add: "mongo-service.default"

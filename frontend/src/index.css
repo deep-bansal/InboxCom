@@ -1,0 +1,15 @@
+main {
+  min-height: 82.2vh;
+}
+
+footer {
+  position: relative;
+}
+
+.end-15 {
+  right: 15px !important;
+}
+
+.bottom-15 {
+  bottom: 15px !important;
+}

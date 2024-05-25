@@ -1,0 +1,70 @@
+---
+- name: Deploy application to Kubernetes
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check if kubectl is installed
+      command: /opt/homebrew/bin/kubectl version --client
+      register: kubectl_check
+      ignore_errors: yes
+
+    - name: Check if minikube is installed
+      command: /opt/homebrew/bin/minikube version
+      register: minikube_check
+      ignore_errors: yes
+      
+    - name: Clone the MailService repository
+      git:
+        repo: https://github.com/deep-bansal/InboxCom.git
+        dest: /Users/{{ ansible_user }}/MailService
+        version: main # Change branch name if needed
+
+    - name: Apply backend Persistent Volume
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/backend-pv.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply backend Persistent Volume Claim
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/backend-pvc.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply MongoDB environment configuration
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/mongo-env.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply MongoDB deployment
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/mongo-deployment.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply MongoDB service
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/mongo-service.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply backend environment configuration
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/backend-env.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply backend deployment
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/backend-deployment.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply backend service
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/backend-service.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply frontend deployment
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/frontend-deployment.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService
+
+    - name: Apply frontend service
+      command: /opt/homebrew/bin/kubectl --kubeconfig=/Users/deepbansal/.kube/config apply -f kubernetes/frontend-service.yaml --validate=false
+      args:
+        chdir: /Users/{{ ansible_user }}/MailService

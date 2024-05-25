@@ -1,0 +1,52 @@
+services:
+
+  mongodb:
+    image: "mongo"
+
+    volumes: 
+     - data:/data/db
+
+    env_file:
+      - ./env/mongo.env
+
+    container_name: mongodb
+
+  backend:
+    image: "deep04bansal/spe_backend" 
+    ports:
+      - '8000:8000'
+
+    volumes:
+      - /app/node_modules
+      - ./backend:/app 
+      - logs:/app/logs
+
+    env_file:
+      - ./env/backend.env
+    
+    container_name: backend
+
+    depends_on:
+      - mongodb
+   
+  frontend:
+    image: "deep04bansal/spe_frontend"  
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    
+    stdin_open: true
+    tty: true
+
+    container_name: frontend
+
+    depends_on:
+      - backend
+
+volumes:
+  data: 
+  logs:
+
+# docker compose up -d --rm

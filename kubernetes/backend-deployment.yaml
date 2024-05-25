@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailing-app
+  labels:
+    group: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: mail
+  template:
+    metadata:
+      labels:
+        pod: mail
+    spec:
+      containers:
+        - name: node-backend
+          image: deep04bansal/spe_backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: env
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: jwt_secret
+            - name: MONGODB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: password
+            - name: MONGODB_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: mongo_add
+          volumeMounts:
+            - mountPath: /app/logs
+              name: backend-volume
+      volumes:
+        - name: backend-volume
+          persistentVolumeClaim:
+            claimName: backend-pvc
